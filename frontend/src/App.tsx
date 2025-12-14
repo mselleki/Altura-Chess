@@ -116,7 +116,7 @@ function App() {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-xl md:text-2xl font-semibold text-gray-900 tracking-tight">
-              ChessFormation Academy
+              Altura Chess Formation
             </h1>
             <nav className="hidden md:flex items-center gap-8">
               <button
@@ -876,9 +876,9 @@ function App() {
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-400 py-10 px-6 border-t border-gray-800">
         <div className="container mx-auto text-center">
-          <h4 className="text-lg font-semibold text-white mb-2">ChessFormation Academy</h4>
+          <h4 className="text-lg font-semibold text-white mb-2">Altura Chess Formation</h4>
           <p className="text-gray-500 text-sm mb-3">La référence en formation de gestion de clubs d'échecs</p>
-          <p className="text-gray-600 text-xs">&copy; 2026 ChessFormation Academy. Tous droits réservés.</p>
+          <p className="text-gray-600 text-xs">&copy; 2026 Altura Chess Formation. Tous droits réservés.</p>
         </div>
       </footer>
     </div>
