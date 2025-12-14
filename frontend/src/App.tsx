@@ -172,7 +172,7 @@ function App() {
                 Simple, reproductible, pensé pour des clubs locaux.
               </p>
               <p className="text-base text-gray-600 mb-8">
-                Testé sur le terrain dans un club comparable au vôtre.
+                Testé sur le terrain à Domloup, un club local comparable au vôtre.
               </p>
               <button
                 onClick={scrollToForm}
@@ -210,13 +210,13 @@ function App() {
           <p className="text-lg text-gray-600 mb-6 leading-relaxed">
             Simple, reproductible, sans dépendre d'une seule personne. Pensé pour des clubs de 30 à 150 licenciés.
           </p>
-          <p className="text-base text-gray-700 leading-relaxed">
-            Vous n'apprenez pas à gérer un club, vous appliquez un modèle qui a déjà fonctionné. Testé sur le terrain, transférable à votre situation.
-          </p>
+            <p className="text-base text-gray-700 leading-relaxed">
+              Vous n'apprenez pas à gérer un club, vous appliquez un modèle qui a déjà fonctionné. Testé sur le terrain à Domloup, transférable à votre situation.
+            </p>
         </div>
       </section>
 
-      {/* Bloc preuve 40 → 120 - EN COLONNES */}
+      {/* Bloc preuve 60 → 120 - EN COLONNES */}
       <section className="py-20 px-6 bg-gray-100 border-b border-gray-200">
         <div className="container mx-auto max-w-6xl">
           <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-8 tracking-tight text-center">
@@ -224,7 +224,7 @@ function App() {
           </h3>
           <div className="grid md:grid-cols-2 gap-8 mb-6">
             <div className="bg-white border-2 border-red-300 p-8 shadow-sm">
-              <div className="text-5xl font-bold text-red-600 mb-2">40</div>
+              <div className="text-5xl font-bold text-red-600 mb-2">60</div>
               <p className="text-sm text-gray-500 mb-4">licenciés</p>
               <h4 className="text-xl font-semibold text-gray-900 mb-4">Si vous continuez</h4>
               <ul className="space-y-3 text-gray-700">
@@ -261,13 +261,54 @@ function App() {
                 </li>
               </ul>
               <p className="mt-4 text-sm text-gray-600 italic">
-                Pendant plusieurs saisons. Un résultat accessible, pas exceptionnel.
+                En 1 an et demi. Un résultat accessible, pas exceptionnel.
               </p>
             </div>
           </div>
-          <p className="text-center text-gray-700 font-medium">
-            Un cas réel. Un résultat accessible.
+          <p className="text-center text-gray-700 font-medium mb-8">
+            Le cas de Domloup, un club local comparable au vôtre.
           </p>
+        </div>
+      </section>
+
+      {/* Résultats concrets Domloup */}
+      <section className="py-20 px-6 bg-white border-b border-gray-200">
+        <div className="container mx-auto max-w-6xl">
+          <div className="mb-8">
+            <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4 tracking-tight text-center">
+              Les résultats concrets à Domloup
+            </h3>
+            <p className="text-center text-gray-600 max-w-2xl mx-auto">
+              Avec l'aide de Guillaume, président et formateur, voici ce qui a été accompli en quelques années.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="bg-gray-50 border border-gray-200 p-6">
+              <div className="text-3xl font-bold text-gray-900 mb-2">60 → 120</div>
+              <p className="text-gray-600 text-sm font-medium">Licenciés en 1 an et demi</p>
+            </div>
+            <div className="bg-gray-50 border border-gray-200 p-6">
+              <div className="text-3xl font-bold text-gray-900 mb-2">0 → 450</div>
+              <p className="text-gray-600 text-sm font-medium">Élèves touchés en milieu scolaire en 2 ans</p>
+            </div>
+            <div className="bg-gray-50 border border-gray-200 p-6">
+              <div className="text-3xl font-bold text-gray-900 mb-2">0 → 3</div>
+              <p className="text-gray-600 text-sm font-medium">Équipes jeunes en 2 ans</p>
+            </div>
+            <div className="bg-gray-50 border border-gray-200 p-6">
+              <div className="text-3xl font-bold text-gray-900 mb-2">3 → 8</div>
+              <p className="text-gray-600 text-sm font-medium">Entraîneurs en 2 ans</p>
+            </div>
+            <div className="bg-gray-50 border border-gray-200 p-6">
+              <div className="text-3xl font-bold text-gray-900 mb-2">0 → 2</div>
+              <p className="text-gray-600 text-sm font-medium">Mécènes privés pérennes en 3 ans</p>
+            </div>
+            <div className="bg-gray-50 border border-gray-200 p-6">
+              <div className="text-3xl font-bold text-gray-900 mb-2">—</div>
+              <p className="text-gray-600 text-sm font-medium">Satisfaction et convivialité au top</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -398,7 +439,7 @@ function App() {
               Ce n'est pas une formation théorique. C'est la mise à plat d'un système qui marche, transférable à votre situation.
             </p>
             <p className="text-base text-gray-700 italic mb-8 max-w-3xl">
-              Chaque module correspond à une décision réelle testée sur le terrain. Vous n'apprenez pas à gérer un club, vous appliquez un modèle qui a déjà fonctionné dans des clubs qui vous ressemblent.
+              Chaque module correspond à une décision réelle testée sur le terrain à Domloup. Vous n'apprenez pas à gérer un club, vous appliquez un modèle qui a déjà fonctionné.
             </p>
             
             {/* Erreurs et échecs */}
