@@ -25,6 +25,31 @@ function App() {
   const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null)
   const [submitMessage, setSubmitMessage] = useState('')
   const [expandedModules, setExpandedModules] = useState<{ [key: number]: boolean }>({})
+  const [testimonialIndex, setTestimonialIndex] = useState(0)
+
+  const testimonials = [
+    {
+      quote:
+        'Nous avions la même taille que Domloup. En une saison, nous avons cessé de gérer au jour le jour.',
+      author: 'Président d’un club local',
+      role: 'Club de 60 licenciés, zone rurale',
+    },
+    {
+      quote:
+        'Avec seulement deux bénévoles, nous avons enfin posé une organisation claire. Moins de stress, plus de visibilité.',
+      author: 'Bénévole référent',
+      role: 'Club de 45 licenciés',
+    },
+    {
+      quote:
+        'Le fait de partir d’un modèle réel nous a rassurés. On a gagné du temps sur l’administratif et sur le recrutement.',
+      author: 'Membre du bureau',
+      role: 'Club de 80 licenciés',
+    },
+  ]
+
+  const nextTestimonial = () => setTestimonialIndex((prev) => (prev + 1) % testimonials.length)
+  const prevTestimonial = () => setTestimonialIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -166,19 +191,19 @@ function App() {
           <div className="grid md:grid-cols-2 gap-12 items-center mb-12">
             <div>
               <h2 className="text-4xl md:text-5xl font-semibold text-gray-900 mb-6 leading-tight tracking-tight">
-                Un système pour arrêter de bricoler et structurer votre club
+                Un système créé pour faire grandir votre club sans vous épuiser
               </h2>
               <p className="text-lg md:text-xl text-gray-600 mb-4 leading-relaxed">
                 Simple, reproductible, pensé pour des clubs locaux.
               </p>
               <p className="text-base text-gray-600 mb-8">
-                Testé sur le terrain à Domloup, un club local comparable au vôtre.
+                Issu de l'expérience concrète d'un club local comparable au vôtre.
               </p>
               <button
                 onClick={scrollToForm}
                 className="bg-gray-900 text-white px-8 py-3 rounded-sm font-medium hover:bg-gray-800 transition-colors text-base"
               >
-                Arrêter de bricoler mon club
+                Passer un cap avec mon club
               </button>
             </div>
             <div className="relative">
@@ -196,8 +221,8 @@ function App() {
       <section className="py-10 px-6 bg-gray-50 border-b border-gray-200">
         <div className="container mx-auto max-w-5xl">
           <p className="text-base text-gray-700 font-medium">
-            Guillaume, président bénévole, pas consultant. Il n'a pas hérité d'un gros club. Il a structuré un petit.
-          </p>
+          Guillaume est président bénévole, pas consultant.
+          Il n’a pas hérité d’un grand club, il a structuré un club local.          </p>
         </div>
       </section>
 
@@ -208,10 +233,10 @@ function App() {
             Un système = décisions + outils + priorités
           </h3>
           <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-            Simple, reproductible, sans dépendre d'une seule personne. Pensé pour des clubs de 30 à 150 licenciés.
+            Simple, reproductible, sans dépendre d'une seule personne. Pensé pour des clubs de 15 à 150 licenciés.
           </p>
             <p className="text-base text-gray-700 leading-relaxed">
-              Vous n'apprenez pas à gérer un club, vous appliquez un modèle qui a déjà fonctionné. Testé sur le terrain à Domloup, transférable à votre situation.
+              Vous n'apprenez pas à gérer un club, vous appliquez un modèle qui a déjà fonctionné plusieurs saisons. Adaptable à votre situation.
             </p>
         </div>
       </section>
@@ -314,16 +339,42 @@ function App() {
 
       {/* Section engagement - INCONFORTABLE */}
       <section className="py-16 px-6 bg-gray-900 text-white border-b border-gray-800">
-        <div className="container mx-auto max-w-3xl">
-          <h3 className="text-2xl md:text-3xl font-semibold mb-6 tracking-tight">
-            Ce que ce système demande
+        <div className="container mx-auto max-w-4xl">
+          <h3 className="text-2xl md:text-3xl font-semibold mb-8 tracking-tight text-center">
+            Ils l'ont appliqué dans leur club
           </h3>
-          <p className="text-lg mb-4 leading-relaxed">
-            Appliquer ce système implique de renoncer à certaines façons de faire. Ce modèle demande de changer certaines habitudes.
-          </p>
-          <p className="text-base text-gray-300 italic">
-            Si vous cherchez une solution magique, passez votre chemin. Ce n'est pas magique, c'est structuré.
-          </p>
+          <div className="bg-gray-800 border border-gray-700 p-8 shadow-lg">
+            <p className="text-xl leading-relaxed mb-4 text-gray-50">
+              “{testimonials[testimonialIndex].quote}”
+            </p>
+            <p className="text-sm text-gray-300 font-semibold">
+              {testimonials[testimonialIndex].author} — {testimonials[testimonialIndex].role}
+            </p>
+            <div className="flex items-center justify-between mt-6">
+              <button
+                onClick={prevTestimonial}
+                className="px-4 py-2 border border-gray-600 text-gray-100 rounded-sm hover:bg-gray-800 transition-colors"
+              >
+                Précédent
+              </button>
+              <div className="flex space-x-2">
+                {testimonials.map((_, idx) => (
+                  <span
+                    key={idx}
+                    className={`w-2.5 h-2.5 rounded-full ${
+                      idx === testimonialIndex ? 'bg-white' : 'bg-gray-600'
+                    }`}
+                  />
+                ))}
+              </div>
+              <button
+                onClick={nextTestimonial}
+                className="px-4 py-2 border border-gray-600 text-gray-100 rounded-sm hover:bg-gray-800 transition-colors"
+              >
+                Suivant
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -332,8 +383,8 @@ function App() {
         <div className="container mx-auto max-w-5xl">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="text-4xl font-bold text-gray-900 mb-3">30-150</div>
-              <div className="text-gray-600 text-sm font-medium">Licenciés : la taille idéale pour votre club</div>
+              <div className="text-4xl font-bold text-gray-900 mb-3">15-150</div>
+              <div className="text-gray-600 text-sm font-medium">Licenciés : périmètre d'accompagnement</div>
             </div>
             <div className="text-center">
               <div className="text-4xl font-bold text-gray-900 mb-3">—</div>
@@ -431,19 +482,19 @@ function App() {
       {/* Benefits Section */}
       <section id="pour-qui" className="py-20 px-6 bg-gray-50">
         <div className="container mx-auto max-w-6xl">
-          <div className="mb-12">
+          <div className="mb-12 text-center max-w-3xl mx-auto">
             <h3 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-6 tracking-tight">
               Ce que vous allez appliquer à votre club
             </h3>
-            <p className="text-lg text-gray-600 mb-6 leading-relaxed max-w-3xl">
+            <p className="text-lg text-gray-600 mb-6 leading-relaxed">
               Ce n'est pas une formation théorique. C'est la mise à plat d'un système qui marche, transférable à votre situation.
             </p>
-            <p className="text-base text-gray-700 italic mb-8 max-w-3xl">
+            <p className="text-base text-gray-700 italic mb-8">
               Chaque module correspond à une décision réelle testée sur le terrain à Domloup. Vous n'apprenez pas à gérer un club, vous appliquez un modèle qui a déjà fonctionné.
             </p>
             
             {/* Erreurs et échecs */}
-            <div className="max-w-3xl bg-yellow-50 border-2 border-yellow-300 p-8 mb-12">
+            <div className="max-w-3xl bg-yellow-50 border-2 border-yellow-300 p-8 mb-12 mx-auto">
               <h4 className="text-xl font-semibold text-gray-900 mb-4">Ce qu'un club a arrêté de faire</h4>
               <p className="text-gray-700 mb-4 leading-relaxed">
                 Les erreurs corrigées en cours de route. Ce qui n'a pas marché (et pourquoi). Montrer l'échec rend la réussite plus crédible.
@@ -469,7 +520,7 @@ function App() {
                 ✓
               </div>
               <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                Faire grandir votre club sans brûler les bénévoles
+                Faire grandir votre club sans épuiser les bénévoles
               </h4>
               <p className="text-gray-600 text-sm leading-relaxed">
                 Arrêter de tout porter seul. Structurer votre club sans devenir esclave de l'administratif. Un système transférable, testé sur le terrain.
@@ -725,6 +776,45 @@ function App() {
               </button>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* FAQ objections */}
+      <section className="py-16 px-6 bg-white border-b border-gray-200">
+        <div className="container mx-auto max-w-4xl">
+          <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-8 tracking-tight text-center">
+            Réponses rapides aux questions fréquentes
+          </h3>
+          <div className="space-y-6">
+            <div>
+              <h4 className="text-lg font-semibold text-gray-900 mb-2">Et si mon club fait entre 15 et 30 licenciés ?</h4>
+              <p className="text-gray-700">La méthode se déploie par étapes. On démarre avec un socle léger (priorités, statuts, rôles) avant d'élargir.</p>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold text-gray-900 mb-2">Et si nous ne sommes que 2 bénévoles ?</h4>
+              <p className="text-gray-700">Le plan inclut un kit d'organisation minimal et des modèles pour déléguer progressivement sans alourdir.</p>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold text-gray-900 mb-2">Et si nous manquons de temps ?</h4>
+              <p className="text-gray-700">Chaque module est découpé en actions courtes (2-3h). L'objectif est de gagner du temps dès les premières semaines.</p>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold text-gray-900 mb-2">Et si notre club est déjà structuré ?</h4>
+              <p className="text-gray-700">La formation sert alors d'audit : on consolide, on priorise, et on ajoute des leviers de financement ou d'animation ciblés.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mise en tension avant CTA */}
+      <section className="py-14 px-6 bg-gray-50 border-b border-gray-200">
+        <div className="container mx-auto max-w-4xl text-center">
+          <p className="text-xl text-gray-900 font-semibold mb-4">
+            La plupart des clubs ne disparaissent pas. Ils stagnent, lentement, jusqu'à l'épuisement des bénévoles.
+          </p>
+          <p className="text-gray-700">
+            Décider maintenant, c'est éviter que l'usure ne s'installe et sécuriser l'avenir du club.
+          </p>
         </div>
       </section>
 
