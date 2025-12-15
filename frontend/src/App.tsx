@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface FormData {
   name: string
@@ -50,6 +50,14 @@ function App() {
 
   const nextTestimonial = () => setTestimonialIndex((prev) => (prev + 1) % testimonials.length)
   const prevTestimonial = () => setTestimonialIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length)
+
+  // Carrousel auto-rotatif
+  useEffect(() => {
+    const id = setInterval(() => {
+      setTestimonialIndex((prev) => (prev + 1) % testimonials.length)
+    }, 6000)
+    return () => clearInterval(id)
+  }, [testimonials.length])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
