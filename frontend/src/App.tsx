@@ -428,65 +428,6 @@ function App() {
         </div>
       </section>
 
-      {/* Avant / Après Section */}
-      <section className="py-20 px-6 bg-white border-b border-gray-200">
-        <div className="container mx-auto max-w-6xl">
-          <div className="mb-12">
-            <h3 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-4 tracking-tight">
-              Avant et après : un cas parmi d'autres
-            </h3>
-            <p className="text-lg text-gray-600 max-w-2xl">
-              Voici ce qui a changé dans un club qui vous ressemble. Un cas concret pour vous projeter.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-8 mb-12">
-            <div className="bg-red-50 border border-red-200 p-8">
-              <h4 className="text-xl font-semibold text-gray-900 mb-4">Avant</h4>
-              <ul className="space-y-3 text-gray-700">
-                <li className="flex items-start">
-                  <span className="text-red-600 mr-2">•</span>
-                  <span>Effectifs stagnants autour de 40 licenciés</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-red-600 mr-2">•</span>
-                  <span>Organisation informelle, dépendance aux bénévoles</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-red-600 mr-2">•</span>
-                  <span>Financements limités et imprévisibles</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-red-600 mr-2">•</span>
-                  <span>Difficultés à structurer l'administratif</span>
-                </li>
-              </ul>
-            </div>
-            <div className="bg-green-50 border border-green-200 p-8">
-              <h4 className="text-xl font-semibold text-gray-900 mb-4">Après</h4>
-              <ul className="space-y-3 text-gray-700">
-                <li className="flex items-start">
-                  <span className="text-green-600 mr-2">•</span>
-                  <span>Croissance à 120 licenciés en quelques saisons</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-green-600 mr-2">•</span>
-                  <span>Stabilité organisationnelle, bénévoles moins surchargés</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-green-600 mr-2">•</span>
-                  <span>Financement diversifié et prévisible</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-green-600 mr-2">•</span>
-                  <span>Administration structurée et maîtrisée</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Benefits Section */}
       <section id="pour-qui" className="py-20 px-6 bg-gray-50">
         <div className="container mx-auto max-w-6xl">
@@ -503,7 +444,7 @@ function App() {
             
             {/* Erreurs et échecs */}
             <div className="max-w-3xl bg-yellow-50 border-2 border-yellow-300 p-8 mb-12 mx-auto">
-              <h4 className="text-xl font-semibold text-gray-900 mb-4">Ce qu'un club a arrêté de faire</h4>
+              <h4 className="text-xl font-semibold text-gray-900 mb-4">Les erreurs que nous avons faites (et que vous n’aurez pas à refaire)</h4>
               <p className="text-gray-700 mb-4 leading-relaxed">
                 Les erreurs corrigées en cours de route. Ce qui n'a pas marché (et pourquoi). Montrer l'échec rend la réussite plus crédible.
               </p>
