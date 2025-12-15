@@ -199,13 +199,13 @@ function AppFormal() {
           <div className="grid md:grid-cols-2 gap-12 items-center mb-12">
             <div>
               <h2 className="text-4xl md:text-5xl font-semibold text-gray-900 mb-6 leading-tight tracking-tight">
-                Un système pour structurer efficacement votre club d'échecs
+                Un système pour arrêter de tout porter seul et faire grandir votre club
               </h2>
               <p className="text-lg md:text-xl text-gray-600 mb-4 leading-relaxed">
-                Méthode simple et reproductible, conçue pour les clubs locaux.
+                Pensé pour les présidents bénévoles qui veulent structurer sereinement leur club.
               </p>
               <p className="text-base text-gray-600 mb-8">
-                Cette approche a été éprouvée au club de Domloup, un club local comparable au vôtre.
+                Soulager l'équipe, fiabiliser l'organisation et sécuriser la croissance.
               </p>
               <button
                 onClick={scrollToForm}
@@ -354,9 +354,12 @@ function AppFormal() {
             <p className="text-xl text-white font-semibold mb-3">
               La plupart des clubs ne disparaissent pas. Ils stagnent, jusqu'à l'épuisement progressif des bénévoles.
             </p>
-            <p className="text-gray-300">
+            <p className="text-gray-300 mb-6">
               Agir maintenant, c'est sécuriser l'organisation et préserver les énergies.
             </p>
+            <div className="inline-flex items-center justify-center bg-white text-gray-900 px-6 py-2.5 rounded-sm font-medium hover:bg-gray-100 transition-colors text-sm">
+              <button onClick={scrollToForm}>Passer à l'action maintenant</button>
+            </div>
           </div>
           <div className="bg-gray-800 border border-gray-700 p-8 shadow-lg">
             <p className="text-xl leading-relaxed mb-4 text-gray-50">
@@ -517,6 +520,16 @@ function AppFormal() {
               <p className="text-gray-600 italic">
                 "L'expérience acquise sur le terrain permet de vous guider et d'éviter les erreurs fréquentes."
               </p>
+            </div>
+
+            {/* Micro-CTA */}
+            <div className="text-center">
+              <button
+                onClick={scrollToForm}
+                className="inline-flex items-center justify-center bg-gray-900 text-white px-6 py-2.5 rounded-sm font-medium hover:bg-gray-800 transition-colors text-sm"
+              >
+                Voir comment l'appliquer à mon club
+              </button>
             </div>
           </div>
           

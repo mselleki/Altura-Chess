@@ -199,13 +199,13 @@ function App() {
           <div className="grid md:grid-cols-2 gap-12 items-center mb-12">
             <div>
               <h2 className="text-4xl md:text-5xl font-semibold text-gray-900 mb-6 leading-tight tracking-tight">
-                Un système créé pour faire grandir votre club sans vous épuiser
+                Un système pour arrêter de tout porter seul et faire grandir votre club
               </h2>
               <p className="text-lg md:text-xl text-gray-600 mb-4 leading-relaxed">
-                Simple, reproductible, pensé pour des clubs locaux.
+                Pour les présidents bénévoles qui veulent structurer, pas juste bricoler.
               </p>
               <p className="text-base text-gray-600 mb-8">
-                Issu de l'expérience concrète d'un club local comparable au vôtre.
+                Soulager l'équipe, sécuriser la croissance, gagner du temps chaque semaine.
               </p>
               <button
                 onClick={scrollToForm}
@@ -510,6 +510,16 @@ function App() {
               <p className="text-gray-600 italic">
                 "On a testé, on a échoué, on a ajusté. Vous n'aurez pas à refaire ces erreurs dans votre club."
               </p>
+            </div>
+
+            {/* Micro-CTA */}
+            <div className="text-center">
+              <button
+                onClick={scrollToForm}
+                className="inline-flex items-center justify-center bg-gray-900 text-white px-6 py-2.5 rounded-sm font-medium hover:bg-gray-800 transition-colors text-sm"
+              >
+                Voir comment l'appliquer à mon club
+              </button>
             </div>
           </div>
           
@@ -820,9 +830,12 @@ function App() {
           <p className="text-xl text-gray-900 font-semibold mb-4">
             La plupart des clubs ne disparaissent pas. Ils stagnent, lentement, jusqu'à l'épuisement des bénévoles.
           </p>
-          <p className="text-gray-700">
+          <p className="text-gray-700 mb-6">
             Décider maintenant, c'est éviter que l'usure ne s'installe et sécuriser l'avenir du club.
           </p>
+          <div className="inline-flex items-center justify-center bg-gray-900 text-white px-6 py-2.5 rounded-sm font-medium hover:bg-gray-800 transition-colors text-sm">
+            <button onClick={scrollToForm}>Passer à l'action maintenant</button>
+          </div>
         </div>
       </section>
 
