@@ -1,15 +1,19 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import App from './App.tsx'
 import AppFormal from './AppFormal.tsx'
+import Programme from './Programme.tsx'
 import './index.css'
-
-// Détecter si on est sur la version formelle
-const isFormal = window.location.pathname === '/formal'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    {isFormal ? <AppFormal /> : <App />}
+    <BrowserRouter>
+      <Routes>
+        <Route path="/formal" element={<AppFormal />} />
+        <Route path="/programme" element={<Programme />} />
+        <Route path="/" element={<App />} />
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>,
 )
-

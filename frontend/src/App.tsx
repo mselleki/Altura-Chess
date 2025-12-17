@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 interface FormData {
   name: string
@@ -32,12 +33,6 @@ function App() {
   const [guideSubmitting, setGuideSubmitting] = useState(false)
   const [guideSubmitted, setGuideSubmitted] = useState(false)
 
-  // Parrainage form states
-  const [parrainageName, setParrainageName] = useState('')
-  const [parrainageEmail, setParrainageEmail] = useState('')
-  const [parrainageClub, setParrainageClub] = useState('')
-  const [parrainageSubmitting, setParrainageSubmitting] = useState(false)
-  const [parrainageSubmitted, setParrainageSubmitted] = useState(false)
 
   // Scroll detection for guide modal - seulement scroll down
   useEffect(() => {
@@ -197,32 +192,6 @@ function App() {
     }
   }
 
-  const handleParrainageSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!parrainageName.trim() || !parrainageEmail.trim() || !parrainageClub.trim()) {
-      return
-    }
-
-    setParrainageSubmitting(true)
-    
-    try {
-      // Simulate API call - replace with actual endpoint
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      setParrainageSubmitted(true)
-      setTimeout(() => {
-        setParrainageName('')
-        setParrainageEmail('')
-        setParrainageClub('')
-        setParrainageSubmitted(false)
-      }, 3000)
-    } catch (error) {
-      console.error('Error submitting parrainage form:', error)
-    } finally {
-      setParrainageSubmitting(false)
-    }
-  }
-
   const scrollToForm = () => {
     document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -231,17 +200,35 @@ function App() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-300 sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-6 py-2">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl md:text-2xl font-semibold text-gray-900 tracking-tight">
-              Altura Chess Formation
-            </h1>
-            <button
-              onClick={scrollToForm}
-              className="bg-gray-900 text-white px-6 py-2.5 rounded-sm font-medium hover:bg-gray-800 transition-colors text-sm"
-            >
-              Contact
-            </button>
+            <Link to="/" className="flex items-center">
+              <img 
+                src="/images/logo_altura.png" 
+                alt="Altura Chess Formation" 
+                className="h-16 md:h-12 w-auto"
+              />
+            </Link>
+            <nav className="flex items-center gap-6">
+              <Link
+                to="/"
+                className="text-gray-900 font-medium text-sm transition-colors border-b-2 border-gray-900"
+              >
+                Accueil
+              </Link>
+              <Link
+                to="/programme"
+                className="text-gray-700 hover:text-gray-900 font-medium text-sm transition-colors"
+              >
+                Programme
+              </Link>
+              <button
+                onClick={scrollToForm}
+                className="bg-gray-900 text-white px-6 py-2.5 rounded-sm font-medium hover:bg-gray-800 transition-colors text-sm"
+              >
+                Contact
+              </button>
+            </nav>
           </div>
         </div>
       </header>
@@ -325,6 +312,14 @@ function App() {
               <div className="text-3xl font-bold text-gray-900 mb-2">—</div>
               <p className="text-gray-600 text-sm font-medium">Satisfaction et convivialité au top</p>
             </div>
+          </div>
+          <div className="text-center mt-12">
+            <Link
+              to="/programme"
+              className="inline-block bg-gray-900 text-white px-8 py-3 rounded-sm font-medium hover:bg-gray-800 transition-colors text-base"
+            >
+              Voir le programme détaillé
+            </Link>
           </div>
         </div>
       </section>
@@ -451,85 +446,21 @@ function App() {
       </section>
 
       {/* Parrainage Section */}
-      <section className="py-20 px-6 bg-white border-b border-gray-200">
-        <div className="container mx-auto max-w-4xl">
-          <div className="text-center mb-8">
-            <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4 tracking-tight">
-              Parrainer un club d'échecs
-            </h3>
-            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-              Vous connaissez un président à bout de souffle ?<br />
-              Si votre recommandation aboutit à une inscription, vous recevez 200 €.
-            </p>
-          </div>
-
-          <div className="bg-gray-50 border border-gray-200 p-8 md:p-10 max-w-2xl mx-auto">
-            {parrainageSubmitted ? (
-              <div className="text-center py-8">
-                <p className="text-green-600 font-medium mb-2">Merci pour votre proposition !</p>
-                <p className="text-gray-600 text-sm">Nous vous contacterons prochainement.</p>
-              </div>
-            ) : (
-              <form onSubmit={handleParrainageSubmit} className="space-y-5">
-                <div>
-                  <label htmlFor="parrainage-name" className="block text-gray-700 mb-2 font-medium text-sm">
-                    Votre nom
-                  </label>
-                  <input
-                    type="text"
-                    id="parrainage-name"
-                    value={parrainageName}
-                    onChange={(e) => setParrainageName(e.target.value)}
-                    className="w-full px-4 py-3 rounded-sm border border-gray-300 bg-white focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-gray-900 placeholder-gray-400 focus:outline-none transition-colors text-base"
-                    placeholder="Votre nom"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="parrainage-email" className="block text-gray-700 mb-2 font-medium text-sm">
-                    Votre email
-                  </label>
-                  <input
-                    type="email"
-                    id="parrainage-email"
-                    value={parrainageEmail}
-                    onChange={(e) => setParrainageEmail(e.target.value)}
-                    className="w-full px-4 py-3 rounded-sm border border-gray-300 bg-white focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-gray-900 placeholder-gray-400 focus:outline-none transition-colors text-base"
-                    placeholder="votre.email@exemple.com"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="parrainage-club" className="block text-gray-700 mb-2 font-medium text-sm">
-                    Club à parrainer
-                  </label>
-                  <input
-                    type="text"
-                    id="parrainage-club"
-                    value={parrainageClub}
-                    onChange={(e) => setParrainageClub(e.target.value)}
-                    className="w-full px-4 py-3 rounded-sm border border-gray-300 bg-white focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-gray-900 placeholder-gray-400 focus:outline-none transition-colors text-base"
-                    placeholder="Nom du club et contact si possible"
-                    required
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={parrainageSubmitting}
-                  className={`w-full py-3 px-6 rounded-sm font-medium text-base transition-colors ${
-                    parrainageSubmitting
-                      ? 'bg-gray-400 text-white cursor-not-allowed'
-                      : 'bg-gray-900 text-white hover:bg-gray-800'
-                  }`}
-                >
-                  {parrainageSubmitting ? 'Envoi en cours...' : 'Proposer un club'}
-                </button>
-              </form>
-            )}
-          </div>
+      <section className="py-20 px-6 bg-gray-50 border-b border-gray-200">
+        <div className="container mx-auto max-w-4xl text-center">
+          <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4 tracking-tight">
+            Parrainer un club d'échecs
+          </h3>
+          <p className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
+            Vous connaissez un président à bout de souffle ?<br />
+            Si votre recommandation aboutit à une inscription, vous recevez 200 €.
+          </p>
+          <a
+            href="mailto:contact@alturachess.fr?subject=Parrainage d'un club"
+            className="inline-block bg-gray-900 text-white px-8 py-3 rounded-sm font-medium hover:bg-gray-800 transition-colors text-base"
+          >
+            Proposer un club
+          </a>
         </div>
       </section>
 
