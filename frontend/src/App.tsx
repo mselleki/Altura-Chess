@@ -24,49 +24,87 @@ function App() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null)
   const [submitMessage, setSubmitMessage] = useState('')
-  const [expandedModules, setExpandedModules] = useState<{ [key: number]: boolean }>({})
-  const [testimonialIndex, setTestimonialIndex] = useState(0)
+  
+  // Guide modal states
+  const [showGuideModal, setShowGuideModal] = useState(false)
+  const [isModalClosing, setIsModalClosing] = useState(false)
+  const [guideEmail, setGuideEmail] = useState('')
+  const [guideSubmitting, setGuideSubmitting] = useState(false)
+  const [guideSubmitted, setGuideSubmitted] = useState(false)
 
-  const testimonials = [
-    {
-      quote:
-        'Nous avions la même taille que Domloup. En une saison, nous avons cessé de gérer au jour le jour.',
-      author: 'Président d’un club local',
-      role: 'Club de 60 licenciés, zone rurale',
-    },
-    {
-      quote:
-        'Avec seulement deux bénévoles, nous avons enfin posé une organisation claire. Moins de stress, plus de visibilité.',
-      author: 'Bénévole référent',
-      role: 'Club de 45 licenciés',
-    },
-    {
-      quote:
-        'Le fait de partir d’un modèle réel nous a rassurés. On a gagné du temps sur l’administratif et sur le recrutement.',
-      author: 'Membre du bureau',
-      role: 'Club de 80 licenciés',
-    },
-  ]
+  // Parrainage form states
+  const [parrainageName, setParrainageName] = useState('')
+  const [parrainageEmail, setParrainageEmail] = useState('')
+  const [parrainageClub, setParrainageClub] = useState('')
+  const [parrainageSubmitting, setParrainageSubmitting] = useState(false)
+  const [parrainageSubmitted, setParrainageSubmitted] = useState(false)
 
-  const nextTestimonial = () => setTestimonialIndex((prev) => (prev + 1) % testimonials.length)
-  const prevTestimonial = () => setTestimonialIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length)
-
-  // Carrousel auto-rotatif
+  // Scroll detection for guide modal - seulement scroll down
   useEffect(() => {
-    const id = setInterval(() => {
-      setTestimonialIndex((prev) => (prev + 1) % testimonials.length)
-    }, 6000)
-    return () => clearInterval(id)
-  }, [testimonials.length])
+    // Vérifier localStorage au chargement
+    if (localStorage.getItem('guideModalShown') === 'true') {
+      return
+    }
+    
+    let lastScrollY = window.scrollY
+    let triggered = false
+    
+    const handleScroll = () => {
+      // Vérifier à nouveau localStorage au cas où il aurait changé
+      if (localStorage.getItem('guideModalShown') === 'true') {
+        return
+      }
+      
+      if (triggered) return
+      
+      const currentScrollY = window.scrollY
+      const isScrollingDown = currentScrollY > lastScrollY
+      lastScrollY = currentScrollY
+      
+      // Ne déclencher que si on scroll vers le bas
+      if (!isScrollingDown) return
+      
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight
+      const scrollPercentage = scrollHeight > 0 ? (window.scrollY / scrollHeight) * 100 : 0
+      
+      // Déclencher entre 30% et 40% de scroll (ou dès 30% si la page est courte)
+      if (scrollPercentage >= 30) {
+        triggered = true
+        localStorage.setItem('guideModalShown', 'true')
+        // Petit délai pour l'animation
+        setTimeout(() => {
+          setShowGuideModal(true)
+        }, 100)
+      }
+    }
+
+    // Attendre que le DOM soit prêt
+    const timeoutId = setTimeout(() => {
+      window.addEventListener('scroll', handleScroll, { passive: true })
+      // Déclencher aussi au premier scroll si on est déjà à 30%
+      handleScroll()
+    }, 100)
+
+    return () => {
+      clearTimeout(timeoutId)
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
+
+  const closeModal = () => {
+    setIsModalClosing(true)
+    setTimeout(() => {
+      setShowGuideModal(false)
+      setIsModalClosing(false)
+    }, 300)
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
-    // Clear error when user starts typing
     if (errors[name as keyof FormErrors]) {
       setErrors(prev => ({ ...prev, [name]: undefined }))
     }
-    // Clear submit status when user starts typing
     if (submitStatus) {
       setSubmitStatus(null)
       setSubmitMessage('')
@@ -134,12 +172,59 @@ function App() {
     }
   }
 
-  const scrollToForm = () => {
-    document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' })
+  const handleGuideSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!guideEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guideEmail)) {
+      return
+    }
+
+    setGuideSubmitting(true)
+    
+    try {
+      // Simulate API call - replace with actual endpoint
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      setGuideSubmitted(true)
+      setTimeout(() => {
+        closeModal()
+        setGuideEmail('')
+        setGuideSubmitted(false)
+      }, 2000)
+    } catch (error) {
+      console.error('Error submitting guide form:', error)
+    } finally {
+      setGuideSubmitting(false)
+    }
   }
 
-  const scrollToSection = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+  const handleParrainageSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!parrainageName.trim() || !parrainageEmail.trim() || !parrainageClub.trim()) {
+      return
+    }
+
+    setParrainageSubmitting(true)
+    
+    try {
+      // Simulate API call - replace with actual endpoint
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      setParrainageSubmitted(true)
+      setTimeout(() => {
+        setParrainageName('')
+        setParrainageEmail('')
+        setParrainageClub('')
+        setParrainageSubmitted(false)
+      }, 3000)
+    } catch (error) {
+      console.error('Error submitting parrainage form:', error)
+    } finally {
+      setParrainageSubmitting(false)
+    }
+  }
+
+  const scrollToForm = () => {
+    document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' })
   }
 
   return (
@@ -151,41 +236,9 @@ function App() {
             <h1 className="text-xl md:text-2xl font-semibold text-gray-900 tracking-tight">
               Altura Chess Formation
             </h1>
-            <nav className="hidden md:flex items-center gap-8">
-              <button
-                onClick={() => scrollToSection('la-methode')}
-                className="text-gray-700 hover:text-gray-900 font-medium text-sm transition-colors"
-              >
-                La méthode
-              </button>
-              <button
-                onClick={() => scrollToSection('le-programme')}
-                className="text-gray-700 hover:text-gray-900 font-medium text-sm transition-colors"
-              >
-                Le programme
-              </button>
-              <button
-                onClick={() => scrollToSection('pour-qui')}
-                className="text-gray-700 hover:text-gray-900 font-medium text-sm transition-colors"
-              >
-                Pour qui
-              </button>
-              <button
-                onClick={scrollToForm}
-                className="text-gray-700 hover:text-gray-900 font-medium text-sm transition-colors"
-              >
-                Contact
-              </button>
-              <button
-                onClick={scrollToForm}
-                className="bg-gray-900 text-white px-6 py-2.5 rounded-sm font-medium hover:bg-gray-800 transition-colors text-sm"
-              >
-                Discuter de mon club
-              </button>
-            </nav>
             <button
               onClick={scrollToForm}
-              className="md:hidden bg-gray-900 text-white px-4 py-2 rounded-sm font-medium hover:bg-gray-800 transition-colors text-sm"
+              className="bg-gray-900 text-white px-6 py-2.5 rounded-sm font-medium hover:bg-gray-800 transition-colors text-sm"
             >
               Contact
             </button>
@@ -195,111 +248,42 @@ function App() {
 
       {/* Hero Section */}
       <section className="py-16 md:py-24 px-6 bg-white border-b border-gray-200">
-        <div className="container mx-auto max-w-5xl">
-          <div className="grid md:grid-cols-2 gap-12 items-center mb-12">
-            <div>
-              <h2 className="text-4xl md:text-5xl font-semibold text-gray-900 mb-6 leading-tight tracking-tight">
-                Un système pour arrêter de tout porter seul et faire grandir votre club
-              </h2>
-              <p className="text-lg md:text-xl text-gray-600 mb-4 leading-relaxed">
-                Pour les présidents bénévoles qui veulent structurer, pas juste bricoler.
-              </p>
-              <p className="text-base text-gray-600 mb-8">
-                Soulager l'équipe, sécuriser la croissance, gagner du temps chaque semaine.
-              </p>
-              <button
-                onClick={scrollToForm}
-                className="bg-gray-900 text-white px-8 py-3 rounded-sm font-medium hover:bg-gray-800 transition-colors text-base"
-              >
-                Passer un cap avec mon club
-              </button>
-            </div>
-            <div className="relative">
-              <img
-                src="/images/chess_famille.jpg"
-                alt="Groupe de membres d'un club d'échecs"
-                className="w-full h-[350px] md:h-[400px] rounded-sm border border-gray-200 shadow-lg object-cover object-center"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Qui est Guillaume */}
-      <section className="py-10 px-6 bg-gray-50 border-b border-gray-200">
-        <div className="container mx-auto max-w-5xl">
-          <p className="text-base text-gray-700 font-medium">
-          Guillaume est président bénévole, pas consultant.
-          Il n’a pas hérité d’un grand club, il a structuré un club local.          </p>
-        </div>
-      </section>
-
-      {/* Définition du système */}
-      <section id="la-methode" className="py-20 px-6 bg-white border-b border-gray-200">
-        <div className="container mx-auto max-w-4xl">
-          <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-6 tracking-tight">
-            Un système = décisions + outils + priorités
-          </h3>
-          <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-            Simple, reproductible, sans dépendre d'une seule personne. Pensé pour des clubs de 15 à 150 licenciés.
+        <div className="container mx-auto max-w-5xl text-center">
+          <h2 className="text-4xl md:text-5xl font-semibold text-gray-900 mb-6 leading-tight tracking-tight">
+            Créer et gérer un club d'échecs sans s'épuiser
+          </h2>
+          <p className="text-lg md:text-xl text-gray-600 mb-4 leading-relaxed max-w-3xl mx-auto">
+            Un système testé pour sortir du chaos administratif et dynamiser votre club.
           </p>
-            <p className="text-base text-gray-700 leading-relaxed">
-              Vous n'apprenez pas à gérer un club, vous appliquez un modèle qui a déjà fonctionné plusieurs saisons. Adaptable à votre situation.
-            </p>
+          <p className="text-base text-gray-600 mb-8 max-w-2xl mx-auto">
+            Pour présidents et bénévoles qui portent déjà trop.
+          </p>
+          <button
+            onClick={scrollToForm}
+            className="bg-gray-900 text-white px-8 py-3 rounded-sm font-medium hover:bg-gray-800 transition-colors text-base"
+          >
+            Structurer mon club sérieusement
+          </button>
         </div>
       </section>
 
-      {/* Bloc preuve 60 → 120 - EN COLONNES */}
-      <section className="py-20 px-6 bg-gray-100 border-b border-gray-200">
-        <div className="container mx-auto max-w-6xl">
+      {/* Video Section */}
+      <section className="py-20 px-6 bg-gray-50 border-b border-gray-200">
+        <div className="container mx-auto max-w-4xl">
           <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-8 tracking-tight text-center">
-            Voilà ce qui vous attend
+            Marie l'a fait dans son club, à Reims
           </h3>
-          <div className="grid md:grid-cols-2 gap-8 mb-6">
-            <div className="bg-white border-2 border-red-300 p-8 shadow-sm">
-              <div className="text-5xl font-bold text-red-600 mb-2">60</div>
-              <p className="text-sm text-gray-500 mb-4">licenciés</p>
-              <h4 className="text-xl font-semibold text-gray-900 mb-4">Si vous continuez</h4>
-              <ul className="space-y-3 text-gray-700">
-                <li className="flex items-start">
-                  <span className="text-red-600 mr-2 font-bold">•</span>
-                  <span>Tout repose sur 1-2 personnes. Charge mentale élevée.</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-red-600 mr-2 font-bold">•</span>
-                  <span>Effectifs stagnants. Organisation informelle.</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-red-600 mr-2 font-bold">•</span>
-                  <span>Financements imprévisibles. Vision à court terme.</span>
-                </li>
-              </ul>
-            </div>
-            <div className="bg-white border-2 border-green-300 p-8 shadow-sm">
-              <div className="text-5xl font-bold text-green-600 mb-2">120</div>
-              <p className="text-sm text-gray-500 mb-4">licenciés</p>
-              <h4 className="text-xl font-semibold text-gray-900 mb-4">Si vous changez</h4>
-              <ul className="space-y-3 text-gray-700">
-                <li className="flex items-start">
-                  <span className="text-green-600 mr-2 font-bold">•</span>
-                  <span>Bénévoles moins surchargés. Organisation plus sereine.</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-green-600 mr-2 font-bold">•</span>
-                  <span>Croissance en structurant, pas en accélérant.</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-green-600 mr-2 font-bold">•</span>
-                  <span>Financements diversifiés. Vision à moyen terme.</span>
-                </li>
-              </ul>
-              <p className="mt-4 text-sm text-gray-600 italic">
-                En 1 an et demi. Un résultat accessible, pas exceptionnel.
-              </p>
-            </div>
+          <div className="aspect-video bg-gray-200 rounded-sm border border-gray-300 mb-6 flex items-center justify-center">
+            <iframe
+              className="w-full h-full rounded-sm"
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+              title="Témoignage club d'échecs"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
           </div>
-          <p className="text-center text-gray-700 font-medium mb-8">
-            Le cas de Domloup, un club local comparable au vôtre.
+          <p className="text-center text-gray-700 text-base">
+            Marie explique comment son club de Reims est passé de 45 à 120 licenciés sans épuiser les bénévoles.
           </p>
         </div>
       </section>
@@ -311,8 +295,8 @@ function App() {
             <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4 tracking-tight text-center">
               Les résultats concrets à Domloup
             </h3>
-            <p className="text-center text-gray-600 max-w-2xl mx-auto">
-              Avec l'aide de Guillaume, président et formateur, voici ce qui a été accompli en quelques années.
+            <p className="text-center text-gray-600 max-w-2xl mx-auto text-sm">
+              Des décisions prises sur le terrain, pas en théorie.
             </p>
           </div>
           
@@ -345,490 +329,32 @@ function App() {
         </div>
       </section>
 
-      {/* Section engagement - INCONFORTABLE */}
-      <section className="py-16 px-6 bg-gray-900 text-white border-b border-gray-800">
-        <div className="container mx-auto max-w-4xl">
-          <h3 className="text-2xl md:text-3xl font-semibold mb-8 tracking-tight text-center">
-            Ils l'ont appliqué dans leur club
-          </h3>
-          <div className="bg-gray-800 border border-gray-700 p-8 shadow-lg">
-            <p className="text-xl leading-relaxed mb-4 text-gray-50">
-              “{testimonials[testimonialIndex].quote}”
-            </p>
-            <p className="text-sm text-gray-300 font-semibold">
-              {testimonials[testimonialIndex].author} — {testimonials[testimonialIndex].role}
-            </p>
-            <div className="flex items-center justify-between mt-6">
-              <button
-                onClick={prevTestimonial}
-                className="px-4 py-2 border border-gray-600 text-gray-100 rounded-sm hover:bg-gray-800 transition-colors"
-              >
-                Précédent
-              </button>
-              <div className="flex space-x-2">
-                {testimonials.map((_, idx) => (
-                  <span
-                    key={idx}
-                    className={`w-2.5 h-2.5 rounded-full ${
-                      idx === testimonialIndex ? 'bg-white' : 'bg-gray-600'
-                    }`}
-                  />
-                ))}
-              </div>
-              <button
-                onClick={nextTestimonial}
-                className="px-4 py-2 border border-gray-600 text-gray-100 rounded-sm hover:bg-gray-800 transition-colors"
-              >
-                Suivant
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section className="py-20 px-6 bg-white border-b border-gray-200">
+      {/* Contact Section */}
+      <section id="contact-form" className="py-16 md:py-20 px-6 bg-gray-50">
         <div className="container mx-auto max-w-5xl">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-gray-900 mb-3">15-150</div>
-              <div className="text-gray-600 text-sm font-medium">Licenciés : périmètre d'accompagnement</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-gray-900 mb-3">—</div>
-              <div className="text-gray-600 text-sm font-medium">Testé sur plusieurs saisons, pas en théorie</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-gray-900 mb-3">—</div>
-              <div className="text-gray-600 text-sm font-medium">Résultat accessible, pas exceptionnel</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Citation vérité */}
-      <section className="py-20 px-6 bg-gray-50 border-b border-gray-200">
-        <div className="container mx-auto max-w-4xl">
-          <blockquote className="text-xl text-gray-800 italic border-l-4 border-gray-900 pl-8 leading-relaxed">
-            "La majorité des clubs stagnent non par manque de passion, mais par absence de méthode. Le bénévolat ne suffit pas à faire grandir un club."
-          </blockquote>
-        </div>
-      </section>
-
-      {/* Projection personnelle */}
-      <section className="py-20 px-6 bg-gray-900 text-white">
-        <div className="container mx-auto max-w-4xl">
-          <h4 className="text-2xl font-semibold mb-6">Questions directes</h4>
-          <p className="text-xl mb-4 leading-relaxed">
-            À quoi ressemblerait votre club dans 2 saisons si rien ne change ?
-          </p>
-          <p className="text-xl leading-relaxed">
-            Combien de temps pouvez-vous encore tout porter seul ?
-          </p>
-        </div>
-      </section>
-
-      {/* Benefits Section */}
-      <section id="pour-qui" className="py-20 px-6 bg-gray-50">
-        <div className="container mx-auto max-w-6xl">
-          <div className="mb-12 text-center max-w-3xl mx-auto">
-            <h3 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-6 tracking-tight">
-              Ce que vous allez appliquer à votre club
+          <div className="text-center mb-12">
+            <h3 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-4 tracking-tight">
+              Contactez-nous
             </h3>
-            <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-              Ce n'est pas une formation théorique. C'est la mise à plat d'un système qui marche, transférable à votre situation.
+            <p className="text-lg text-gray-600 mb-6">
+              Vous pouvez aussi simplement nous écrire ou nous appeler.
             </p>
-            <p className="text-base text-gray-700 italic mb-8">
-              Chaque module correspond à une décision réelle testée sur le terrain à Domloup. Vous n'apprenez pas à gérer un club, vous appliquez un modèle qui a déjà fonctionné.
+            <p className="text-base text-gray-600 mb-2">
+              <a href="mailto:contact@alturachess.fr" className="text-gray-900 font-medium hover:underline">
+                contact@alturachess.fr
+              </a>
             </p>
-            
-            {/* Erreurs et échecs */}
-            <div className="max-w-3xl bg-yellow-50 border-2 border-yellow-300 p-8 mb-12 mx-auto">
-              <h4 className="text-xl font-semibold text-gray-900 mb-4">Les erreurs que nous avons faites (et que vous n’aurez pas à refaire)</h4>
-              <p className="text-gray-700 mb-4 leading-relaxed">
-                Les erreurs corrigées en cours de route. Ce qui n'a pas marché (et pourquoi). Montrer l'échec rend la réussite plus crédible.
-              </p>
-              <p className="text-gray-600 italic">
-                "On a testé, on a échoué, on a ajusté. Vous n'aurez pas à refaire ces erreurs dans votre club."
-              </p>
-            </div>
-
-            {/* Micro-CTA */}
-            <div className="text-center">
-              <button
-                onClick={scrollToForm}
-                className="inline-flex items-center justify-center bg-gray-900 text-white px-6 py-2.5 rounded-sm font-medium hover:bg-gray-800 transition-colors text-sm"
-              >
-                Voir comment l'appliquer à mon club
-              </button>
-            </div>
-          </div>
-          
-          {/* Image de formation */}
-          <div className="mb-12">
-            <img
-              src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&h=600&fit=crop&q=80"
-              alt="Formation professionnelle - Formateur avec audience"
-              className="w-full h-auto rounded-sm border border-gray-200 shadow-sm object-cover"
-            />
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white border border-gray-200 p-6 hover:border-gray-300 transition-colors">
-              <div className="w-10 h-10 bg-gray-900 rounded-sm flex items-center justify-center text-white text-lg font-semibold mb-4">
-                ✓
-              </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                Faire grandir votre club sans épuiser les bénévoles
-              </h4>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Arrêter de tout porter seul. Structurer votre club sans devenir esclave de l'administratif. Un système transférable, testé sur le terrain.
-              </p>
-            </div>
-            <div className="bg-white border border-gray-200 p-6 hover:border-gray-300 transition-colors">
-              <div className="w-10 h-10 bg-gray-900 rounded-sm flex items-center justify-center text-white text-lg font-semibold mb-4">
-                ✓
-              </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                Chercher des financements sans dépendre uniquement des subventions
-              </h4>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Mettre une comptabilité propre dans votre club sans être expert-comptable. Une méthode testée, accessible.
-              </p>
-            </div>
-            <div className="bg-white border border-gray-200 p-6 hover:border-gray-300 transition-colors">
-              <div className="w-10 h-10 bg-gray-900 rounded-sm flex items-center justify-center text-white text-lg font-semibold mb-4">
-                ✓
-              </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                Organiser des tournois qui servent la croissance de votre club
-              </h4>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Pas juste le prestige. Des événements qui font grandir votre club. Un modèle reproductible.
-              </p>
-            </div>
-            <div className="bg-white border border-gray-200 p-6 hover:border-gray-300 transition-colors">
-              <div className="w-10 h-10 bg-gray-900 rounded-sm flex items-center justify-center text-white text-lg font-semibold mb-4">
-                ✓
-              </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                Sortir l'administratif de votre tête
-              </h4>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Arrêter que tout repose sur vous dans votre club. Statuts, gestion, administration légale : un système qui libère du temps.
-              </p>
-            </div>
-            <div className="bg-white border border-gray-200 p-6 hover:border-gray-300 transition-colors">
-              <div className="w-10 h-10 bg-gray-900 rounded-sm flex items-center justify-center text-white text-lg font-semibold mb-4">
-                ✓
-              </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                Recruter et fidéliser dans votre club sans marketing générique
-              </h4>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Techniques concrètes pour faire grandir les effectifs de votre club. Pas de théorie, du vécu transférable.
-              </p>
-            </div>
-            <div className="bg-white border border-gray-200 p-6 hover:border-gray-300 transition-colors">
-              <div className="w-10 h-10 bg-gray-900 rounded-sm flex items-center justify-center text-white text-lg font-semibold mb-4">
-                ✓
-              </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                Développer des programmes dans votre club sans se disperser
-              </h4>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Des cours structurés pour tous les niveaux dans votre club. Un modèle reproductible, testé sur le terrain.
-              </p>
-            </div>
-          </div>
-
-          {/* Section erreurs de Guillaume */}
-          <div className="mt-12 bg-gray-100 border border-gray-300 p-8">
-            <h4 className="text-xl font-semibold text-gray-900 mb-4">Les erreurs à éviter dans votre club</h4>
-            <p className="text-gray-700 mb-4">
-              On a testé, on a échoué, on a ajusté. Voici ce qui n'a pas marché et pourquoi. Montrer l'échec rend la réussite plus crédible.
+            <p className="text-base text-gray-600 mb-6">
+              <a href="tel:+33123456789" className="text-gray-900 font-medium hover:underline">
+                +33 1 23 45 67 89
+              </a>
             </p>
-            <ul className="space-y-2 text-gray-700 text-sm">
-              <li className="flex items-start">
-                <span className="text-gray-600 mr-2">•</span>
-                <span>Les tentatives de recrutement génériques qui n'ont rien donné dans votre club</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-gray-600 mr-2">•</span>
-                <span>L'organisation de votre club qui repose trop sur une seule personne</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-gray-600 mr-2">•</span>
-                <span>Les financements que vous attendez sans les chercher activement</span>
-              </li>
-            </ul>
-            <p className="text-gray-600 text-sm mt-4 italic">
-              Vous n'aurez pas à refaire ces erreurs dans votre club. C'est ça, la valeur d'un retour d'expérience transférable.
+            <p className="text-sm text-gray-500 italic">
+              Aucun engagement.
             </p>
           </div>
 
-          {/* Section pour qui ce n'est PAS fait */}
-          <div className="mt-6 bg-gray-100 border border-gray-300 p-8">
-            <h4 className="text-xl font-semibold text-gray-900 mb-4">Pour qui cette formation n'est pas faite</h4>
-            <p className="text-gray-700 mb-4">
-              Cette formation n'est pas faite pour les clubs qui veulent rester informels. Ni pour ceux qui refusent de structurer leur fonctionnement.
-            </p>
-            <p className="text-gray-600 text-sm">
-              Si vous cherchez une méthode théorique ou un cours de gestion classique, ce n'est pas ici. Ici, on applique un système qui a marché. Point.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Détails de la formation */}
-      <section id="le-programme" className="py-20 px-6 bg-white border-b border-gray-200">
-        <div className="container mx-auto max-w-6xl">
-          <div className="mb-12">
-            <h3 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-6 tracking-tight">
-              La formation en détail
-            </h3>
-            <p className="text-lg text-gray-600 mb-8 max-w-3xl leading-relaxed">
-              21 heures de formation structurée en 3 modules. Chaque séance correspond à une décision réelle prise sur le terrain.
-            </p>
-          </div>
-
-          {/* Informations pratiques */}
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
-            <div className="bg-gray-50 border border-gray-200 p-6">
-              <h4 className="text-lg font-semibold text-gray-900 mb-3">Public</h4>
-              <p className="text-gray-700 text-sm leading-relaxed mb-3">
-                Président, membre du bureau ou bénévole impliqué dans la gestion de votre club d'échecs.
-              </p>
-            </div>
-            <div className="bg-gray-50 border border-gray-200 p-6">
-              <h4 className="text-lg font-semibold text-gray-900 mb-3">Durée</h4>
-              <p className="text-gray-700 text-sm leading-relaxed mb-3">
-                21 heures de formation réparties en séances pratiques et applicables immédiatement.
-              </p>
-            </div>
-            <div className="bg-gray-50 border border-gray-200 p-6">
-              <h4 className="text-lg font-semibold text-gray-900 mb-3">Tarifs</h4>
-              <p className="text-gray-700 text-sm leading-relaxed mb-2">
-                <span className="font-semibold">1 500 €</span> pour un apprenant
-              </p>
-              <p className="text-gray-700 text-sm leading-relaxed mb-3">
-                <span className="font-semibold">2 000 €</span> pour un groupe (jusqu'à 3 apprenants)
-              </p>
-            </div>
-          </div>
-          <p className="text-center text-gray-700 italic mb-12 max-w-2xl mx-auto">
-            Cette formation s'adresse à ceux qui tiennent leur club à bout de bras… et qui veulent que ça dure.
-          </p>
-
-          {/* Bénéfices humains */}
-          <div className="mb-12 bg-gray-900 text-white p-8">
-            <h4 className="text-xl font-semibold mb-4">Ce que cette formation va vous enlever comme problèmes :</h4>
-            <ul className="space-y-3 text-gray-200">
-              <li className="flex items-start">
-                <span className="text-white mr-2 font-bold">•</span>
-                <span>Ne plus tout porter seul. Savoir exactement qui fait quoi.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-white mr-2 font-bold">•</span>
-                <span>Arrêter de subir l'administratif. Avoir des outils qui fonctionnent.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-white mr-2 font-bold">•</span>
-                <span>Ne plus dépendre d'une seule personne. Structurer pour que ça tienne.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-white mr-2 font-bold">•</span>
-                <span>Avoir une vision claire à 2-3 saisons. Sécuriser l'avenir du club.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-white mr-2 font-bold">•</span>
-                <span>Faire grandir sans s'épuiser. Animer efficacement au jour le jour.</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Les 3 modules */}
-          <div className="space-y-6">
-            {/* Module 1 */}
-            <div className="border-l-4 border-gray-900 pl-6">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <h4 className="text-2xl font-semibold text-gray-900 mb-3">Module 1 : Sortir le club du chaos administratif</h4>
-                  <p className="text-gray-700 mb-3 leading-relaxed">
-                    Statuts, assemblées générales, budget, comptabilité. Les bases solides pour que tout ne repose plus sur vous.
-                  </p>
-                  {expandedModules[1] && (
-                    <div className="mt-4 space-y-2 text-sm text-gray-600">
-                      <p className="font-medium text-gray-700">Cadre juridique et statutaire :</p>
-                      <p>Loi 1901, statuts, rôles des dirigeants, assemblées générales</p>
-                      <p className="font-medium text-gray-700 mt-4">Organisation et gouvernance :</p>
-                      <p>Structuration interne, prise de décision, gestion des conflits</p>
-                      <p className="font-medium text-gray-700 mt-4">Gestion financière :</p>
-                      <p>Budget, comptabilité, cotisations, subventions, obligations fiscales</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <button
-                onClick={() => setExpandedModules({ ...expandedModules, [1]: !expandedModules[1] })}
-                className="mt-3 text-sm font-medium text-gray-900 hover:text-gray-700"
-              >
-                {expandedModules[1] ? 'Masquer le détail' : 'Voir le détail du module'}
-              </button>
-            </div>
-
-            {/* Module 2 */}
-            <div className="border-l-4 border-gray-900 pl-6">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <h4 className="text-2xl font-semibold text-gray-900 mb-3">Module 2 : Faire vivre le club sans s'épuiser</h4>
-                  <p className="text-gray-700 mb-3 leading-relaxed">
-                    Bénévoles, joueurs, entraîneurs, tournois. Animer efficacement votre club au jour le jour sans tout porter seul.
-                  </p>
-                  {expandedModules[2] && (
-                    <div className="mt-4 space-y-2 text-sm text-gray-600">
-                      <p className="font-medium text-gray-700">Gestion des ressources humaines :</p>
-                      <p>Fidéliser les bénévoles, encadrer salariés/prestataires, organiser des événements</p>
-                      <p className="font-medium text-gray-700 mt-4">Gestion des compétitions :</p>
-                      <p>Motiver les joueurs, règlement FFE, suivi des joueurs, gestion des équipes</p>
-                      <p className="font-medium text-gray-700 mt-4">Formateurs :</p>
-                      <p>Trouver des entraîneurs, programmes adaptés, contenu de cours, bénévole vs professionnel</p>
-                      <p className="font-medium text-gray-700 mt-4">Événements ouverts au public :</p>
-                      <p>Stages vacances, opens, réglementation buvettes, arbitrage</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <button
-                onClick={() => setExpandedModules({ ...expandedModules, [2]: !expandedModules[2] })}
-                className="mt-3 text-sm font-medium text-gray-900 hover:text-gray-700"
-              >
-                {expandedModules[2] ? 'Masquer le détail' : 'Voir le détail du module'}
-              </button>
-            </div>
-
-            {/* Module 3 */}
-            <div className="border-l-4 border-gray-900 pl-6">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <h4 className="text-2xl font-semibold text-gray-900 mb-3">Module 3 : Sécuriser l'avenir du club</h4>
-                  <p className="text-gray-700 mb-3 leading-relaxed">
-                    Communication, financements, projets durables. Faire grandir votre club avec une vision à moyen terme.
-                  </p>
-                  {expandedModules[3] && (
-                    <div className="mt-4 space-y-2 text-sm text-gray-600">
-                      <p className="font-medium text-gray-700">Communication et visibilité :</p>
-                      <p>Identité associative, communication interne/externe, réseaux sociaux, relations partenaires</p>
-                      <p className="font-medium text-gray-700 mt-4">Développement de projets :</p>
-                      <p>Projet associatif, subventions, appels à projets, mécénat, sponsoring</p>
-                      <p className="font-medium text-gray-700 mt-4">Projets à forte valeur ajoutée :</p>
-                      <p>Interventions scolaires, périscolaire, service civique, déplacements club</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <button
-                onClick={() => setExpandedModules({ ...expandedModules, [3]: !expandedModules[3] })}
-                className="mt-3 text-sm font-medium text-gray-900 hover:text-gray-700"
-              >
-                {expandedModules[3] ? 'Masquer le détail' : 'Voir le détail du module'}
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ objections */}
-      <section className="py-16 px-6 bg-white border-b border-gray-200">
-        <div className="container mx-auto max-w-4xl">
-          <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-8 tracking-tight text-center">
-            Réponses rapides aux questions fréquentes
-          </h3>
-          <div className="space-y-6">
-            <div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">Et si mon club fait entre 15 et 30 licenciés ?</h4>
-              <p className="text-gray-700">La méthode se déploie par étapes. On démarre avec un socle léger (priorités, statuts, rôles) avant d'élargir.</p>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">Et si nous ne sommes que 2 bénévoles ?</h4>
-              <p className="text-gray-700">Le plan inclut un kit d'organisation minimal et des modèles pour déléguer progressivement sans alourdir.</p>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">Et si nous manquons de temps ?</h4>
-              <p className="text-gray-700">Chaque module est découpé en actions courtes (2-3h). L'objectif est de gagner du temps dès les premières semaines.</p>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">Et si notre club est déjà structuré ?</h4>
-              <p className="text-gray-700">La formation sert alors d'audit : on consolide, on priorise, et on ajoute des leviers de financement ou d'animation ciblés.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Mise en tension avant CTA */}
-      <section className="py-14 px-6 bg-gray-50 border-b border-gray-200">
-        <div className="container mx-auto max-w-4xl text-center">
-          <p className="text-xl text-gray-900 font-semibold mb-4">
-            La plupart des clubs ne disparaissent pas. Ils stagnent, lentement, jusqu'à l'épuisement des bénévoles.
-          </p>
-          <p className="text-gray-700 mb-6">
-            Décider maintenant, c'est éviter que l'usure ne s'installe et sécuriser l'avenir du club.
-          </p>
-          <div className="inline-flex items-center justify-center bg-gray-900 text-white px-6 py-2.5 rounded-sm font-medium hover:bg-gray-800 transition-colors text-sm">
-            <button onClick={scrollToForm}>Passer à l'action maintenant</button>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 md:py-20 px-6 bg-gray-900 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <img
-            src="https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=1200&h=600&fit=crop&q=80"
-            alt="Tournoi d'échecs professionnel"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="container mx-auto max-w-4xl text-center relative z-10">
-          <h3 className="text-3xl md:text-4xl font-semibold text-white mb-4 tracking-tight">
-            Prêt à passer un cap dans votre club ?
-          </h3>
-          <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
-            Appliquez un modèle testé sur le terrain, transférable à votre club. Pas besoin de notoriété, ni de gros budget. Un résultat accessible.
-          </p>
-          <button
-            onClick={scrollToForm}
-            className="bg-white text-gray-900 px-8 py-3 rounded-sm font-medium hover:bg-gray-100 transition-colors text-base"
-          >
-            Passer un cap dans mon club
-          </button>
-        </div>
-      </section>
-
-      {/* Contact Form Section */}
-      <section id="contact-form" className="py-16 md:py-20 px-6 bg-white">
-        <div className="container mx-auto max-w-5xl">
-          <div className="grid md:grid-cols-2 gap-8 items-start">
-            <div>
-              <img
-                src="https://images.unsplash.com/photo-1555255707-c07966088b7b?w=800&h=600&fit=crop&q=80"
-                alt="Échiquier et pièces d'échecs"
-                className="w-full h-auto rounded-sm border border-gray-200 shadow-sm object-cover"
-              />
-            </div>
-            <div className="bg-white border border-gray-200 p-8 md:p-10">
-            <div className="text-center mb-8">
-              <div className="inline-block bg-gray-100 text-gray-700 px-4 py-1.5 rounded-sm text-xs font-medium mb-4 tracking-wide uppercase">
-                Formulaire de contact
-              </div>
-              <h3 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-4 tracking-tight">
-                Appliquer le modèle à votre club
-              </h3>
-              <p className="text-lg text-gray-600">
-                Remplissez le formulaire ci-dessous et Guillaume vous contactera pour discuter de la situation de votre club
-              </p>
-            </div>
-
+          <div className="bg-white border border-gray-200 p-8 md:p-10 max-w-2xl mx-auto">
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label htmlFor="name" className="block text-gray-700 mb-2 font-medium text-sm">
@@ -920,7 +446,89 @@ function App() {
                 {isSubmitting ? 'Envoi en cours...' : 'Structurer mon club sérieusement'}
               </button>
             </form>
-            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Parrainage Section */}
+      <section className="py-20 px-6 bg-white border-b border-gray-200">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center mb-8">
+            <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4 tracking-tight">
+              Parrainer un club d'échecs
+            </h3>
+            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+              Vous connaissez un président à bout de souffle ?<br />
+              Si votre recommandation aboutit à une inscription, vous recevez 200 €.
+            </p>
+          </div>
+
+          <div className="bg-gray-50 border border-gray-200 p-8 md:p-10 max-w-2xl mx-auto">
+            {parrainageSubmitted ? (
+              <div className="text-center py-8">
+                <p className="text-green-600 font-medium mb-2">Merci pour votre proposition !</p>
+                <p className="text-gray-600 text-sm">Nous vous contacterons prochainement.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleParrainageSubmit} className="space-y-5">
+                <div>
+                  <label htmlFor="parrainage-name" className="block text-gray-700 mb-2 font-medium text-sm">
+                    Votre nom
+                  </label>
+                  <input
+                    type="text"
+                    id="parrainage-name"
+                    value={parrainageName}
+                    onChange={(e) => setParrainageName(e.target.value)}
+                    className="w-full px-4 py-3 rounded-sm border border-gray-300 bg-white focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-gray-900 placeholder-gray-400 focus:outline-none transition-colors text-base"
+                    placeholder="Votre nom"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="parrainage-email" className="block text-gray-700 mb-2 font-medium text-sm">
+                    Votre email
+                  </label>
+                  <input
+                    type="email"
+                    id="parrainage-email"
+                    value={parrainageEmail}
+                    onChange={(e) => setParrainageEmail(e.target.value)}
+                    className="w-full px-4 py-3 rounded-sm border border-gray-300 bg-white focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-gray-900 placeholder-gray-400 focus:outline-none transition-colors text-base"
+                    placeholder="votre.email@exemple.com"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="parrainage-club" className="block text-gray-700 mb-2 font-medium text-sm">
+                    Club à parrainer
+                  </label>
+                  <input
+                    type="text"
+                    id="parrainage-club"
+                    value={parrainageClub}
+                    onChange={(e) => setParrainageClub(e.target.value)}
+                    className="w-full px-4 py-3 rounded-sm border border-gray-300 bg-white focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-gray-900 placeholder-gray-400 focus:outline-none transition-colors text-base"
+                    placeholder="Nom du club et contact si possible"
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={parrainageSubmitting}
+                  className={`w-full py-3 px-6 rounded-sm font-medium text-base transition-colors ${
+                    parrainageSubmitting
+                      ? 'bg-gray-400 text-white cursor-not-allowed'
+                      : 'bg-gray-900 text-white hover:bg-gray-800'
+                  }`}
+                >
+                  {parrainageSubmitting ? 'Envoi en cours...' : 'Proposer un club'}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </section>
@@ -933,6 +541,87 @@ function App() {
           <p className="text-gray-600 text-xs">&copy; 2026 Altura Chess Formation. Tous droits réservés.</p>
         </div>
       </footer>
+
+      {/* Guide Modal */}
+      {showGuideModal && (
+        <div className="fixed inset-0 z-50">
+          {/* Overlay - sibling, pas parent */}
+          <div 
+            className={`absolute inset-0 bg-black/40 transition-opacity duration-300 ${
+              isModalClosing ? 'opacity-0' : 'opacity-100'
+            }`}
+            onClick={closeModal}
+          />
+          
+          {/* Modal - sibling, complètement opaque */}
+          <div className="relative flex items-center justify-center min-h-screen p-4">
+            <div 
+              className={`bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full relative transition-all duration-300 ${
+                isModalClosing ? 'opacity-0 scale-95 translate-y-4' : 'opacity-100 scale-100 translate-y-0'
+              }`}
+              onClick={(e) => e.stopPropagation()}
+            >
+            <button
+              onClick={closeModal}
+              className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-2xl font-light transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+            >
+              ×
+            </button>
+            
+            {guideSubmitted ? (
+              <div className="text-center py-6">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className="text-green-600 font-semibold mb-2 text-lg">Merci !</p>
+                <p className="text-gray-600 text-sm">Le guide vous sera envoyé par email.</p>
+              </div>
+            ) : (
+              <>
+                <div className="mb-6">
+                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+                    <span className="text-2xl">📘</span>
+                  </div>
+                  <h3 className="text-2xl font-semibold text-gray-900 mb-3 leading-tight">
+                    Les 5 décisions qui sauvent un club avant l'épuisement des bénévoles
+                  </h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    Un guide issu du terrain pour présidents et bénévoles de clubs d'échecs.
+                  </p>
+                </div>
+                
+                <form onSubmit={handleGuideSubmit} className="space-y-4">
+                  <div>
+                    <input
+                      type="email"
+                      value={guideEmail}
+                      onChange={(e) => setGuideEmail(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:border-gray-900 focus:ring-2 focus:ring-gray-900 focus:ring-opacity-20 text-gray-900 placeholder-gray-400 focus:outline-none transition-all text-base"
+                      placeholder="Votre email"
+                      required
+                    />
+                  </div>
+                  
+                  <button
+                    type="submit"
+                    disabled={guideSubmitting}
+                    className={`w-full py-3.5 px-6 rounded-xl font-semibold text-base transition-all shadow-lg ${
+                      guideSubmitting
+                        ? 'bg-gray-400 text-white cursor-not-allowed'
+                        : 'bg-gray-900 text-white hover:bg-gray-800 hover:shadow-xl'
+                    }`}
+                  >
+                    {guideSubmitting ? 'Envoi...' : 'Recevoir le guide gratuitement'}
+                  </button>
+                </form>
+              </>
+            )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
